@@ -11,7 +11,7 @@ from pygame.locals import *
 ###################################
 try:
     import pycogworks as cw
-    print ('success')
+    #print ('success')
     E_Support = True
 except ImportError:
     E_Support = False
@@ -32,7 +32,7 @@ class Logger ():
             self.log_file.writelines(ln)
             self.log_file.write('\n')
         else:
-            print (time.time(), args)
+            pass#print (time.time(), args)
         return
     def info (self, *args):
         self.LogInfo (*args)
@@ -82,7 +82,7 @@ class Entry:
                     if event.key == K_x:
                         pygame.event.post(pygame.event.Event(QUIT))
         
-        print('done')
+        #print('done')
 
 class CheckerBoard:
      def showBoard(self, cellsPerHeight, rate, duration):
@@ -104,7 +104,7 @@ class CheckerBoard:
         self.widthHeight = (self.cellSize, self.cellSize)
         self.numRows = screenHeight // self.cellSize
         self.numCols = screenWidth // self.cellSize
-        print ('Checkerboard rows, cols:', self.numRows, ',', self.numCols)
+        #print ('Checkerboard rows, cols:', self.numRows, ',', self.numCols)
         offset = (screenWidth % self.cellSize // 2, screenHeight % self.cellSize // 2)
         for self.rowIndex in range (self.numRows):
             
@@ -114,10 +114,10 @@ class CheckerBoard:
                  self.draw = False
                
             for self.colIndex in range (self.numCols):
-                print 'rowIndex, colIndex:', self.rowIndex, ',', self.colIndex
+                #print 'rowIndex, colIndex:', self.rowIndex, ',', self.colIndex
                 if self.draw == True:
                     self.rect = pygame.Rect(self.colIndex * self.cellSize + offset[0], self.rowIndex * self.cellSize + offset[1], self.cellSize, self.cellSize)
-                    print 'rect:', self.rect, self.draw
+                    #print 'rect:', self.rect, self.draw
                     self.draw = False
                 else:
                     self.draw = True
@@ -127,22 +127,19 @@ class CheckerBoard:
         pygame.draw.circle(surfaceCheckerboard, self.dotColor, screenCenter, 10) 
         fpsClock = pygame.time.Clock()
         # rate = checkerboards / sec
-        rate = 5
         # fps = 2 * rate - flash on / off
-        fps = 9 * 2
+        fps = rate * 2
         # duration of flashing total
-        duration = 10
         # number of frames over time
         frames = fps * duration
         
-        for self.index in range(frames):
-            if self.index % 2 == 0:
-                screen.blit(surfaceCheckerboard, (0, 0))
-                pygame.display.flip()
-            else:
-                screen.blit(surfaceBackground, (0, 0))
-                pygame.display.flip()
+        displays = [surfaceCheckerboard, surfaceBackground]
+        on = 1
+        for _ in range(frames):
+            screen.blit(displays[on], (0, 0))
+            pygame.display.flip()
             fpsClock.tick(fps)
+            on = not on
             
 class ReadyDisplay:
     def prompt(self):
@@ -175,7 +172,7 @@ class DotDisplay:
         self.deltaX = math.cos(self.angle) * dist
         self.deltaY = math.sin(self.angle) * dist
         moved = [original[0] + self.deltaX, original[1] + self.deltaY]
-        print  dist, angleDeg, self.angle, original, moved
+        #print  dist, angleDeg, self.angle, original, moved
         return moved
     def drawDisplay(self, angleDeg, distance):
         
@@ -189,15 +186,17 @@ class DotDisplay:
         distanceToTravel = float(self.apatureSize) * 5.0 / 8.0
         numberOfFrames = int(float(desiredFps) / 2.0)
         distancePerFrame = distanceToTravel / numberOfFrames
-        print ("distancePerFrame: ", distancePerFrame)
+        #print ("distancePerFrame: ", distancePerFrame)
        
         distance = 0.0
         counter = 1.0
         sumMs = 0.0
         
+        apSurf = screen.copy()
+        
         for frameIndex in range(numberOfFrames):
             
-            screen.blit(self.surfaceBackground, (0, 0))
+            apSurf.blit(self.surfaceBackground, (0, 0))
             # Process each star in the list
             for i in range(len(self.star_list)):
                 self.moved = self.movePt(self.star_list[i], distance, angleDeg)
@@ -205,9 +204,10 @@ class DotDisplay:
                 self.y = int(self.moved[1])
                 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  #
                 if self.apatureRect.collidepoint(self.x, self.y):
-                    pygame.draw.circle(screen, black, [self.x, self.y], 1)
-                    pygame.gfxdraw.filled_circle(screen, math.trunc(self.moved[0]), math.trunc(self.moved[1]), 2, black)
-                 
+                    #pygame.draw.circle(screen, black, [self.x, self.y], 1)
+                    pygame.draw.circle(apSurf, black, (int(round(self.moved[0])), int(round(self.moved[1]))), 2)
+            
+            screen.blit(apSurf, (0,0))     
             pygame.display.flip()
             distance += distancePerFrame
             if frameIndex == 0:
@@ -216,7 +216,7 @@ class DotDisplay:
                 counter += 1.0
                 sumMs += fpsClock.tick(desiredFps)
         perFrame = sumMs / counter
-        print ('perframe: ', perFrame, 'fps', (1000 / perFrame))
+        #print ('perframe: ', perFrame, 'fps', (1000 / perFrame))
         return distance
         
     def getAngle(self, angle):
@@ -262,7 +262,7 @@ class DotDisplay:
         
         # Black on white
         self.backColor = pygame.Color(0, 0, 0)
-        self.backColor = pygame.Color(255, 255, 255)
+        # self.backColor = pygame.Color(255, 255, 255)
         self.foreColor = pygame.Color(255, 255, 255)
         self.apatureColor = pygame.Color(255, 255, 255)
         # Create an empty array
@@ -302,7 +302,7 @@ class DotDisplay:
                 self.star_list.append([x, y])
         timeFinish = time.clock()
         finalTime = timeFinish - timeStart
-        print (finalTime)
+        #print (finalTime)
         
         self.surfaceBackground = screen.copy()
         self.surfaceBackground.fill(self.backColor)
@@ -335,6 +335,7 @@ class DotDisplay:
             logging.LogInfo('Info       ', 'TrialInfo', 'Correct Response:', flag, 'Base Angle:', baseAngle, 'Type of Angle:', typeOfAngle)
             dataEntryDisplay = DataEntryDisplay()
             dataEntryDisplay.display((int(angle1) == int(angle2)))
+            
 class DataEntryDisplay:
     def display(self, isIdentical):
         self.blueColor = pygame.Color(0, 0, 255)
@@ -358,15 +359,15 @@ class DataEntryDisplay:
                         processing = False
                         if (isIdentical):
                             numberCorrect += 1
-                            print ('Correct')
-                            print ("Number Correct:", numberCorrect)
-                            print ("Number Incorrect:", numberIncorrect)
+                            #print ('Correct')
+                            #print ("Number Correct:", numberCorrect)
+                            #print ("Number Incorrect:", numberIncorrect)
                             logging.LogInfo('Info        ', 'UserInput', 'KeyDown', str(unichr(event.key)).upper(), 'CORRECT', numberCorrect)
                         else:
                             numberIncorrect += 1
-                            print ('Incorrect')
-                            print ("Number Correct:", numberCorrect)
-                            print ("Number Incorrect:", numberIncorrect)
+                            #print ('Incorrect')
+                            #print ("Number Correct:", numberCorrect)
+                            #print ("Number Incorrect:", numberIncorrect)
                             logging.LogInfo('Info        ', 'UserInput', 'KeyDown', str(unichr(event.key)).upper(), 'INCORRECT', numberIncorrect)
                                                    
                         pygame.time.delay(1000)
@@ -375,15 +376,15 @@ class DataEntryDisplay:
                         processing = False
                         if (isIdentical):
                             numberIncorrect += 1
-                            print ('Incorrect')
-                            print ("Number Correct:", numberCorrect)
-                            print ("Number Incorrect:", numberIncorrect)
+                            #print ('Incorrect')
+                            #print ("Number Correct:", numberCorrect)
+                            #print ("Number Incorrect:", numberIncorrect)
                             logging.LogInfo('Info        ', 'UserInput', 'KeyDown', str(unichr(event.key)).upper(), 'INCORRECT', numberIncorrect)
                         else:
                             numberCorrect += 1
-                            print ('Correct')
-                            print ("Number Correct:", numberCorrect)
-                            print ("Number Incorrect:", numberIncorrect)
+                            #print ('Correct')
+                            #print ("Number Correct:", numberCorrect)
+                            #print ("Number Incorrect:", numberIncorrect)
                             logging.LogInfo('Info        ', 'UserInput', 'KeyDown', str(unichr(event.key)).upper(), 'CORRECT', numberCorrect)
                         pygame.time.delay(1000)
                         break
@@ -461,7 +462,7 @@ resultsDisplay = ResultsDisplay()
 resultsDisplayEnd = ResultsDisplayEnd()
 info = pygame.display.Info()
 
-screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.FULLSCREEN|pygame.DOUBLEBUF)
 screenWidth, screenHeight = screen.get_size()
 logging.info('Screen width:', screenWidth)
 logging.info('Screen height:', screenHeight)
@@ -478,7 +479,7 @@ logging.info('DisplayWindow', 'Intro')
 # trials
 numTrials = 1  # 330
 numBlocks = 2
-timeOfChecker = 15  # 60 for 2 blocks OR 120 for 1 block
+timeOfChecker = 3  # 60 for 2 blocks OR 120 for 1 block
 # PRESENT CHECKER ONCE for 120 sec
 # checkerBoard = CheckerBoard()
 #
